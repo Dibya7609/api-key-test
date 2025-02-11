@@ -52,7 +52,7 @@ jobs:
                 },
                 {
                   headers: {
-                    Authorization: `Bearer \${apiKey}`,
+                    Authorization: `Bearer ${apiKey}`,
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://lovable.ai",
                     "X-Title": "Lovable Real Estate Photo Analyzer"
@@ -70,6 +70,9 @@ jobs:
               }
             } catch (error) {
               console.error("Error testing API:", error.message || error);
+              if (error.response) {
+                console.error("API Error Response:", error.response.data);
+              }
               process.exit(1);
             }
           };
