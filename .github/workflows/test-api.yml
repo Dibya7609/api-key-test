@@ -35,10 +35,14 @@ jobs:
             process.exit(1);
           }
 
+          console.log("Using API key:", apiKey);
+
           const testApi = async () => {
             try {
+              console.log("Sending request to API...");
+
               const response = await axios.post(
-                "https://openrouter.ai/api/v1/chat/completions",
+                "https://openrouter.ai/api/v1/chat/completations",
                 {
                   model: "qwen/qwen-vl-plus:free",
                   messages: [
