@@ -1,1 +1,76 @@
+name: Test OpenRouter API
 
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+  workflow_dispatch:  # Allow manual triggering from the GitHub Actions UI
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Use Node.js version 18 (or another supported version)
+
+      - name: Install dependencies
+        run: npm install axios  # Install Axios for making HTTP requests
+
+      - name: Test API Key and Endpoint
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}  # Use the secret API key
+        run: |
+          # Create a simple Node.js script to test the API
+          echo 'const axios = require("axios");
+
+          const apiKey = process.env.OPENROUTER_API_KEY;
+          if (!apiKey) {
+            console.error("API key is missing!");
+            process.exit(1);
+          }
+
+          const testApi = async () => {
+            try {
+              const response = await axios.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                {
+                  model: "qwen/qwen-vl-plus:free",
+                  messages: [
+                    { role: "system", content: "Test prompt." },
+                    { role: "user", content: "Hello, can you respond?" }
+                  ]
+                },
+                {
+                  headers: {
+                    Authorization: \`Bearer \${apiKey}\`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://lovable.ai",
+                    "X-Title": "Lovable Real Estate Photo Analyzer"
+                  }
+                }
+              );
+
+              console.log("API Response:", response.data);
+
+              if (response.status === 200) {
+                console.log("API key and endpoint are working correctly.");
+              } else {
+                console.error("API request failed with status:", response.status);
+                process.exit(1);
+              }
+            } catch (error) {
+              console.error("Error testing API:", error.message || error);
+              process.exit(1);
+            }
+          };
+
+          testApi();' > test-api.js
+
+          # Run the script
+          node test-api.js
